@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yesi Sugandi — System Analyst & Web Developer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+
+    /* Hero enter animations */
+    .hero-anim {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroIn 0.5s ease forwards;
+    }
+    .hero-anim-1 { animation-delay: 0s; }
+    .hero-anim-2 { animation-delay: 0.08s; }
+    .hero-anim-3 { animation-delay: 0.16s; }
+    .hero-anim-4 { animation-delay: 0.28s; }
+    .hero-photo {
+      opacity: 0;
+      transform: scale(0.85);
+      animation: photoIn 0.6s ease 0.2s forwards;
+    }
+    @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+    @keyframes photoIn { to { opacity: 1; transform: scale(1); } }
+
+    /* Scroll-triggered fade animations */
+    .fade-up   { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-right{ opacity: 0; transform: translateX(30px);  transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.visible, .fade-left.visible, .fade-right.visible { opacity: 1; transform: none; }
+
+    /* Stagger delays */
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+
+    /* Hover image zoom */
+    .img-zoom { transition: transform 0.5s ease; }
+    .img-wrap:hover .img-zoom { transform: scale(1.05); }
+    .img-overlay { opacity: 0; transition: opacity 0.3s ease; }
+    .img-wrap:hover .img-overlay { opacity: 1; }
+    .zoom-hint { opacity: 0; transition: opacity 0.3s ease; }
+    .img-wrap:hover .zoom-hint { opacity: 1; }
+
+    /* Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox-img {
+      max-width: min(90vw, 1100px);
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    }
+
+    /* Project card hover lift */
+    .proj-card {
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .proj-card:hover {
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 font-sans antialiased">
+
+  <!-- ═══════════════════════════════════════════
+       LIGHTBOX
+  ═══════════════════════════════════════════ -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
+      <button
+        onclick="closeLightbox()"
+        aria-label="Close"
+        style="position:absolute;top:-18px;right:-18px;z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;color:#111;border:none;cursor:pointer;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);"
+      >&times;</button>
+      <img id="lightbox-img" src="" alt="" />
+      <p id="lightbox-cap" style="text-align:center;color:rgba(255,255,255,0.55);font-size:0.8rem;margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════ -->
+  <header id="navbar" style="position:fixed;top:0;left:0;right:0;z-index:50;padding:1.5rem 0;transition:all 0.3s ease;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;">
+      <a href="#" onclick="scrollTop(event)" style="font-size:1.4rem;font-weight:800;color:#2D6A4F;text-decoration:none;letter-spacing:-0.02em;">
+        Yesi Sugandi<span style="color:#FF8C42;">.</span>
+      </a>
+      <nav id="desktop-nav" style="display:none;gap:2rem;align-items:center;">
+        <a href="#about"      class="nav-link">About</a>
+        <a href="#skills"     class="nav-link">Skills</a>
+        <a href="#experience" class="nav-link">Experience</a>
+        <a href="#projects"   class="nav-link">Projects</a>
+        <a href="#contact"    class="nav-link">Contact</a>
+      </nav>
+      <button id="hamburger" onclick="toggleMenu()" aria-label="Toggle menu"
+        style="background:none;border:none;cursor:pointer;padding:6px;display:flex;color:#1f2937;">
+        <svg id="ico-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="ico-x" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,0.08);padding:1.5rem 2rem;">
+      <nav style="display:flex;flex-direction:column;gap:0;">
+        <a href="#about"      class="mob-link" onclick="closeMenu()">About</a>
+        <a href="#skills"     class="mob-link" onclick="closeMenu()">Skills</a>
+        <a href="#experience" class="mob-link" onclick="closeMenu()">Experience</a>
+        <a href="#projects"   class="mob-link" onclick="closeMenu()">Projects</a>
+        <a href="#contact"    class="mob-link" onclick="closeMenu()">Contact</a>
+        <a href="#contact" onclick="closeMenu()" style="margin-top:1rem;padding:0.75rem 1.25rem;border-radius:999px;background:#2D6A4F;color:#fff;text-align:center;font-weight:600;text-decoration:none;">Let's Talk</a>
+      </nav>
+    </div>
+  </header>
+
+  <style>
+    .nav-link { font-size:0.875rem;font-weight:500;color:#6b7280;text-decoration:none;transition:color 0.2s; }
+    .nav-link:hover { color:#2D6A4F; }
+    .mob-link { display:block;padding:0.75rem 0;font-weight:500;color:#1f2937;text-decoration:none;border-bottom:1px solid #f3f4f6; }
+    @media(min-width:768px){
+      #desktop-nav { display:flex !important; }
+      #hamburger   { display:none !important; }
+    }
+  </style>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════ -->
+  <section style="position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding-top:5rem;overflow:hidden;">
+    <div style="position:absolute;top:25%;left:25%;width:24rem;height:24rem;border-radius:50%;background:rgba(45,106,79,0.05);filter:blur(60px);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:25%;right:25%;width:30rem;height:30rem;border-radius:50%;background:rgba(255,140,66,0.05);filter:blur(60px);pointer-events:none;"></div>
+
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;width:100%;position:relative;z-index:1;">
+      <div style="display:flex;flex-direction:column-reverse;align-items:center;justify-content:space-between;gap:3rem;">
+
+        <div style="max-width:680px;text-align:center;">
+          <div class="hero-anim hero-anim-1">
+            <span style="display:inline-block;padding:0.4rem 1rem;border-radius:999px;background:rgba(168,213,186,0.25);color:#2D6A4F;font-size:0.8rem;font-weight:700;margin-bottom:1.5rem;border:1px solid #A8D5BA;letter-spacing:0.02em;">
+              Available for full-time roles
+            </span>
+          </div>
+          <h1 class="hero-anim hero-anim-2" style="font-size:clamp(2.8rem,8vw,5rem);font-weight:800;color:#111;line-height:1.1;letter-spacing:-0.03em;margin:0 0 0.5rem;">
+            Yesi Sugandi
+          </h1>
+          <div class="hero-anim hero-anim-3" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0.5rem;margin-bottom:1.5rem;">
+            <span style="font-size:clamp(1.2rem,3vw,1.75rem);font-weight:700;color:#2D6A4F;">Sytem Analyst</span>
+            <span style="font-size:clamp(1.2rem,3vw,1.75rem);color:#d1d5db;font-weight:300;">|</span>
+            <span style="font-size:clamp(1.2rem,3vw,1.75rem);font-weight:700;color:#FF8C42;">Web Developer</span>
+          </div>
+          <p class="hero-anim hero-anim-3" style="font-size:1.1rem;color:#6b7280;line-height:1.75;margin-bottom:2.5rem;">
+            Bridging Business Needs with Technical Solutions — fresh graduate from Universitas Atma Jaya Yogyakarta with hands-on internship experience in backend development and system analysis.
+          </p>
+          <div class="hero-anim hero-anim-4" style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+            <a href="#projects" style="display:inline-flex;align-items:center;gap:0.5rem;padding:1rem 2rem;border-radius:999px;background:#2D6A4F;color:#fff;font-weight:600;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+              View My Work
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-photo" style="flex-shrink:0;">
+          <div style="position:relative;width:clamp(14rem,20vw,18rem);height:clamp(14rem,20vw,18rem);">
+            <div style="position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,rgba(45,106,79,0.3),rgba(255,140,66,0.2));filter:blur(28px);transform:scale(1.1);"></div>
+            <div style="position:relative;width:100%;height:100%;border-radius:50%;border:4px solid #fff;box-shadow:0 20px 60px rgba(0,0,0,0.15);overflow:hidden;">
+              <img src="./yesi-sugandi.jpg" alt="Yesi Sugandi" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            </div>
+            <div style="position:absolute;bottom:-8px;right:-8px;width:40px;height:40px;border-radius:50%;background:#FF8C42;box-shadow:0 4px 12px rgba(255,140,66,0.4);"></div>
+            <div style="position:absolute;top:-8px;left:-8px;width:24px;height:24px;border-radius:50%;background:rgba(45,106,79,0.4);"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       ABOUT
+  ═══════════════════════════════════════════ -->
+  <section id="about" style="padding:6rem 0;background:#fff;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;">
+      <div style="display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;">
+
+        <!-- MBTI Card -->
+        <div class="fade-left" style="display:flex;justify-content:center;">
+          <div style="width:100%;max-width:290px;">
+            <div style="border-radius:24px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 8px 40px rgba(0,0,0,0.1);background:#fff;position:relative;">
+              <div style="background:#2D6A4F;padding:2rem 1.75rem 1.5rem;color:#fff;">
+                <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.55);margin:0 0 4px;text-transform:uppercase;">Personality Type</p>
+                <h3 style="font-size:3.5rem;font-weight:900;letter-spacing:-0.04em;margin:0 0 2px;line-height:1;">ISTP</h3>
+                <p style="font-size:1.1rem;font-weight:600;color:rgba(255,255,255,0.9);margin:0 0 2px;">The Virtuoso</p>
+                <p style="font-size:0.78rem;color:rgba(255,255,255,0.55);margin:0;">Introverted · Sensing · Thinking · Perceiving</p>
+              </div>
+              <div style="height:6px;background:linear-gradient(to right,#FF8C42,rgba(255,140,66,0.5),rgba(45,106,79,0.3));"></div>
+              <div style="padding:1.25rem 1.75rem;display:flex;flex-direction:column;gap:0.75rem;">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,140,66,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  </div>
+                  <span style="font-size:0.85rem;font-weight:500;color:#1f2937;">Hands-On Problem Solver</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,140,66,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </div>
+                  <span style="font-size:0.85rem;font-weight:500;color:#1f2937;">Observant &amp; Analytical</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,140,66,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+                  </div>
+                  <span style="font-size:0.85rem;font-weight:500;color:#1f2937;">Independent Thinker</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,140,66,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </div>
+                  <span style="font-size:0.85rem;font-weight:500;color:#1f2937;">Pragmatic &amp; Efficient</span>
+                </div>
+              </div>
+              <div style="padding:0 1.75rem 1.5rem;">
+                <div style="border-radius:12px;background:rgba(168,213,186,0.18);border:1px solid #e5e7eb;padding:0.75rem 1rem;font-size:0.78rem;color:#6b7280;line-height:1.6;">
+                  ISTPs thrive on logic and practical action — they excel at building systems, debugging problems, and turning abstract requirements into working solutions.
+                </div>
+              </div>
+              <div style="position:absolute;top:16px;right:16px;width:12px;height:12px;border-radius:50%;background:rgba(255,140,66,0.4);"></div>
+              <div style="position:absolute;top:28px;right:30px;width:6px;height:6px;border-radius:50%;background:rgba(255,140,66,0.2);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="fade-right delay-2">
+          <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#111;letter-spacing:-0.03em;margin:0 0 1.5rem;">About Me</h2>
+          <div style="width:48px;height:4px;background:#FF8C42;border-radius:2px;margin-bottom:2rem;"></div>
+          <p style="font-size:1.05rem;color:#6b7280;line-height:1.75;margin-bottom:1rem;">
+            Fresh graduate in Informatics Engineering from Universitas Atma Jaya Yogyakarta (GPA 3.58) with 6 months of hands-on internship experience as a Backend Developer.
+          </p>
+          <p style="font-size:1.05rem;color:#6b7280;line-height:1.75;margin-bottom:2rem;">
+            I have a strong foundation in full-stack web development, system requirements analysis, and comprehensive technical documentation using SDLC and Agile/Scrum methodologies. I love tackling challenges and bridging the gap between what users need and what technology can deliver.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;">
+            <span class="badge-chip"><span class="check-ico"></span>GPA 3.58 / 4.00</span>
+            <span class="badge-chip"><span class="check-ico"></span>Agile / Scrum</span>
+            <span class="badge-chip"><span class="check-ico"></span>Fast Learner</span>
+            <span class="badge-chip"><span class="check-ico"></span>Detail-Oriented</span>
+          </div>
+          <div style="padding:1rem 1.25rem;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;">
+            <p style="font-size:0.875rem;color:#6b7280;margin:0 0 4px;"><strong style="color:#111;">Education:</strong> S1 Teknik Informatika · Universitas Atma Jaya Yogyakarta · 2020 – 2025</p>
+            <p style="font-size:0.875rem;color:#6b7280;margin:0;"><strong style="color:#111;">Location:</strong> Rengat, Riau · Open to WFO / WFH / Hybrid · Relocatable across Indonesia</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <style>
+    .badge-chip { display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;border-radius:999px;background:#f9fafb;border:1px solid #e5e7eb;font-size:0.85rem;font-weight:500;color:#1f2937; }
+    .check-ico { display:inline-block;width:16px;height:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%232D6A4F' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E");background-size:contain;background-repeat:no-repeat; }
+    @media(min-width:768px){
+      #about > div > div { grid-template-columns: 5fr 7fr !important; }
+    }
+  </style>
+
+  <!-- ═══════════════════════════════════════════
+       SKILLS
+  ═══════════════════════════════════════════ -->
+  <section id="skills" style="padding:6rem 0;background:rgba(168,213,186,0.15);">
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;">
+      <div class="fade-up" style="text-align:center;margin-bottom:4rem;">
+        <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#111;letter-spacing:-0.03em;margin:0 0 1rem;">Core Competencies</h2>
+        <div style="width:48px;height:4px;background:#2D6A4F;border-radius:2px;margin:0 auto 1.5rem;"></div>
+        <p style="color:#6b7280;max-width:580px;margin:0 auto;line-height:1.7;">
+          A full-stack toolkit spanning backend development, frontend, database, system analysis, and people skills — built to deliver end-to-end web solutions.
+        </p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;">
+
+        <div class="skill-card fade-up delay-1">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+          <h3 class="sk-title">System Analysis &amp; SDLC</h3>
+          <ul class="sk-list">
+            <li>Requirement Gathering</li><li>SRS / FRS</li><li>UML (Use Case, Activity, Class)</li><li>Agile / Scrum</li><li>Waterfall</li>
+          </ul>
+        </div>
+
+        <div class="skill-card fade-up delay-2">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3 class="sk-title">Backend Development</h3>
+          <ul class="sk-list">
+            <li>PHP</li><li>Laravel</li><li>RESTful API</li><li>Authentication &amp; Authorization</li><li>RBAC</li><li>OOP</li><li>MVC</li>
+          </ul>
+        </div>
+
+        <div class="skill-card fade-up delay-3">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3 class="sk-title">Frontend Development</h3>
+          <ul class="sk-list">
+            <li>HTML5</li><li>CSS3</li><li>JavaScript</li><li>Vue.js</li><li>Bootstrap</li><li>Responsive UI</li>
+          </ul>
+        </div>
+
+        <div class="skill-card fade-up delay-1">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <h3 class="sk-title">Database</h3>
+          <ul class="sk-list">
+            <li>MySQL</li><li>Query Optimization</li><li>Database Design</li><li>ERD</li><li>Data Modeling</li>
+          </ul>
+        </div>
+
+        <div class="skill-card fade-up delay-2">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h3 class="sk-title">Tools &amp; Workflow</h3>
+          <ul class="sk-list">
+            <li>Git &amp; GitHub</li><li>VS Code</li><li>Postman</li><li>Figma</li><li>Canva</li><li>Unit Testing &amp; Debugging</li>
+          </ul>
+        </div>
+
+        <div class="skill-card fade-up delay-3">
+          <div class="sk-icon" style="background:rgba(168,213,186,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="sk-title">Soft Skills</h3>
+          <ul class="sk-list">
+            <li>Problem Solving</li><li>Team Collaboration</li><li>Leadership</li><li>Communication</li><li>Time Management</li><li>Adaptability</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <style>
+    .skill-card { padding:2rem;border-radius:16px;background:#fff;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,0.04);transition:box-shadow 0.3s; }
+    .skill-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.09); }
+    .sk-icon { width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem; }
+    .sk-title { font-size:1.1rem;font-weight:700;color:#111;margin:0 0 1rem; }
+    .sk-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem; }
+    .sk-list li { display:flex;align-items:flex-start;gap:0.5rem;font-size:0.9rem;color:#6b7280; }
+    .sk-list li::before { content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(45,106,79,0.4);flex-shrink:0;margin-top:6px; }
+  </style>
+
+  <!-- ═══════════════════════════════════════════
+       EXPERIENCE
+  ═══════════════════════════════════════════ -->
+  <section id="experience" style="padding:6rem 0;background:#fff;">
+    <div style="max-width:900px;margin:0 auto;padding:0 2rem;">
+      <div class="fade-up" style="margin-bottom:4rem;">
+        <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#111;letter-spacing:-0.03em;margin:0 0 1rem;">Internship Experience</h2>
+        <div style="width:48px;height:4px;background:#2D6A4F;border-radius:2px;margin-bottom:1.5rem;"></div>
+        <p style="color:#6b7280;">Real-world applications of my academic knowledge and problem-solving skills.</p>
+      </div>
+      <div style="position:relative;border-left:2px solid #e5e7eb;margin-left:12px;padding-left:2.5rem;padding-top:0.5rem;">
+        <div class="fade-left" style="position:relative;">
+          <div style="position:absolute;left:-2.95rem;top:4px;width:24px;height:24px;border-radius:50%;background:#f3f4f6;border:4px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #e5e7eb;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#2D6A4F;"></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:0.5rem;">
+            <div>
+              <h3 style="font-size:1.5rem;font-weight:800;color:#111;margin:0 0 2px;">Backend Developer Intern</h3>
+              <div style="font-size:1.05rem;font-weight:600;color:#2D6A4F;">PT Mandhira Reksa Indonesia</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:0.85rem;color:#6b7280;">
+              <span style="display:flex;align-items:center;gap:5px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Aug 2023 – Jan 2024
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Jakarta (Remote)
+              </span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+            <h4 style="font-weight:700;margin:0 0 0.75rem;display:flex;align-items:center;gap:0.5rem;color:#111;font-size:0.95rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              Key Responsibilities
+            </h4>
+            <ul style="list-style:disc;padding-left:1.25rem;display:flex;flex-direction:column;gap:0.5rem;color:#6b7280;margin:0 0 1.25rem;font-size:0.9rem;line-height:1.6;">
+              <li>Conducted requirement gathering and business analysis for an e-learning system together with stakeholders, and compiled SRS/FRS documents as development guidelines.</li>
+              <li>Designed ERD, Data Modeling, and system flow, then developed RESTful APIs using Laravel with RBAC implementation and MySQL query optimization.</li>
+              <li>Collaborated in an Agile/Scrum environment, participating in sprint planning, daily standups, and retrospectives.</li>
+            </ul>
+            <div style="padding:1rem;border-radius:12px;background:rgba(168,213,186,0.2);border:1px solid rgba(168,213,186,0.5);">
+              <div style="font-size:0.75rem;font-weight:800;color:#2D6A4F;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Key Achievement</div>
+              <p style="color:#111;font-weight:600;margin:0;font-size:0.9rem;line-height:1.5;">Designed 10+ UML diagrams (Use Case, Activity, ERD) for a new HRIS system, significantly improving development clarity and team alignment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PROJECTS
+  ═══════════════════════════════════════════ -->
+  <section id="projects" style="padding:6rem 0;background:rgba(168,213,186,0.15);">
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;gap:1.5rem;">
+        <div class="fade-left">
+          <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#111;letter-spacing:-0.03em;margin:0 0 1rem;">Projects &amp; Case Studies</h2>
+          <div style="width:48px;height:4px;background:#FF8C42;border-radius:2px;margin-bottom:1.5rem;"></div>
+          <p style="color:#6b7280;max-width:480px;line-height:1.7;">A selection of academic and professional projects demonstrating my full-stack capabilities and analytical approach.</p>
+        </div>
+        <div class="fade-right">
+          <a href="https://github.com/YesiS9" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.5rem;color:#2D6A4F;font-weight:600;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#2D6A4F'">
+            View GitHub Profile
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;max-width:900px;margin:0 auto;">
+
+        <!-- Project 1 -->
+        <div class="proj-card fade-up" style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;">
+          <div class="img-wrap" style="height:210px;overflow:hidden;position:relative;background:#f3f4f6;cursor:zoom-in;" onclick="openLightbox('./erd-sentrad.png','Traditional Artist System ERD diagram')">
+            <img src="./erd-sentrad.png" alt="Traditional Artist System ERD" class="img-zoom" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            <div class="img-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);"></div>
+            <div class="zoom-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#1f2937;font-size:0.8rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View Full ERD
+              </div>
+            </div>
+            <span style="position:absolute;bottom:10px;right:10px;font-size:0.7rem;font-weight:600;color:#fff;background:rgba(0,0,0,0.5);padding:3px 10px;border-radius:999px;">Apr 2024 – Aug 2025</span>
+          </div>
+          <div style="padding:1.75rem;display:flex;flex-direction:column;flex:1;">
+            <h3 style="font-size:1.1rem;font-weight:700;color:#111;margin:0 0 0.75rem;">Traditional Artist Data Management System</h3>
+            <p style="color:#6b7280;font-size:0.9rem;line-height:1.6;flex:1;margin:0 0 1.25rem;">Final year thesis — independently managed the full SDLC: requirement analysis, ERD/Flowchart, implementation of 8+ functional modules (admin dashboard, user management, reporting), and production deployment.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;">
+              <span class="tag">Laravel</span><span class="tag">Vue.js</span><span class="tag">MySQL</span><span class="tag">Bootstrap</span><span class="tag">Full-Stack</span>
+            </div>
+            <div style="display:flex;gap:0.75rem;">
+              <button onclick="openLightbox('./erd-sentrad.png','Traditional Artist System ERD diagram')" class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View ERD
+              </button>
+              <a href="https://drive.google.com/drive/folders/1TNvcMRqnm2uYTIR1-n58KYOU-awVq9sr?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                View Docs
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="proj-card fade-up delay-2" style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;">
+          <div class="img-wrap" style="height:210px;overflow:hidden;position:relative;background:#f3f4f6;cursor:zoom-in;" onclick="openLightbox('./erd-elearning.jpg','E-Learning system ERD diagram')">
+            <img src="./erd-elearning.jpg" alt="E-Learning system ERD" class="img-zoom" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            <div class="img-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);"></div>
+            <div class="zoom-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#1f2937;font-size:0.8rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View Full ERD
+              </div>
+            </div>
+            <span style="position:absolute;bottom:10px;right:10px;font-size:0.7rem;font-weight:600;color:#fff;background:rgba(0,0,0,0.5);padding:3px 10px;border-radius:999px;">Aug 2023 – Jan 2024</span>
+          </div>
+          <div style="padding:1.75rem;display:flex;flex-direction:column;flex:1;">
+            <h3 style="font-size:1.1rem;font-weight:700;color:#111;margin:0 0 0.75rem;">E-Learning System (Backend API)</h3>
+            <p style="color:#6b7280;font-size:0.9rem;line-height:1.6;flex:1;margin:0 0 1.25rem;">Developed during internship at PT Mandhira Reksa Indonesia — built a scalable RESTful API with Laravel, implementing Role-Based Access Control (RBAC), optimized MySQL queries, and produced SRS/FRS documentation.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;">
+              <span class="tag">Laravel</span><span class="tag">RESTful API</span><span class="tag">RBAC</span><span class="tag">MySQL</span><span class="tag">Agile</span>
+            </div>
+            <div style="display:flex;gap:0.75rem;">
+              <button onclick="openLightbox('./erd-elearning.jpg','E-Learning system ERD diagram')" class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View ERD
+              </button>
+              <a href="https://drive.google.com/drive/folders/1bgCoJAPetaMV-TpiucabXxm0_5l5TLSf?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                View Docs
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <style>
+    .tag { font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;color:#4b5563; }
+    .btn-outline { flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0.7rem;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;color:#1f2937;font-weight:600;font-size:0.85rem;cursor:pointer;transition:background 0.2s,color 0.2s,border-color 0.2s; }
+    .btn-outline:hover { background:#2D6A4F;color:#fff;border-color:#2D6A4F; }
+    .btn-primary { flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0.7rem;border-radius:10px;background:#2D6A4F;color:#fff;font-weight:600;font-size:0.85rem;text-decoration:none;transition:opacity 0.2s; }
+    .btn-primary:hover { opacity:0.88; }
+  </style>
+
+  <!-- ═══════════════════════════════════════════
+       ORGANIZATIONS
+  ═══════════════════════════════════════════ -->
+  <section style="padding:6rem 0;background:#fff;">
+    <div style="max-width:900px;margin:0 auto;padding:0 2rem;">
+      <div class="fade-up" style="margin-bottom:4rem;text-align:center;">
+        <h2 style="font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#111;letter-spacing:-0.03em;margin:0 0 1rem;">Organizational Experience</h2>
+        <div style="width:48px;height:4px;background:#2D6A4F;border-radius:2px;margin:0 auto 1.5rem;"></div>
+        <p style="color:#6b7280;">Leadership and collaboration beyond the classroom.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+        <!-- KS Robotik -->
+        <div class="fade-up delay-1" style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.04);transition:box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 6px rgba(0,0,0,0.04)'">
+          <div class="img-wrap" style="height:176px;overflow:hidden;position:relative;background:#f3f4f6;cursor:zoom-in;" onclick="openLightbox('./sertifikat-robotik.jpg','Sertifikat Koordinator Bidang Software – KS Robotik UAJY')">
+            <img src="./sertifikat-robotik.jpg" alt="Sertifikat KS Robotik" class="img-zoom" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            <div class="img-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);"></div>
+            <div class="zoom-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#1f2937;font-size:0.8rem;font-weight:700;padding:6px 14px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View Certificate
+              </div>
+            </div>
+          </div>
+          <div style="padding:1.5rem 2rem;position:relative;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:1rem;">
+              <div style="display:flex;align-items:flex-start;gap:1rem;">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(45,106,79,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <h3 style="font-size:1.1rem;font-weight:700;color:#111;margin:0 0 2px;">Koordinator Bidang Software</h3>
+                  <div style="color:#6b7280;font-weight:500;font-size:0.9rem;">KS Robotik UAJY</div>
+                </div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;font-weight:600;color:#6b7280;background:#f3f4f6;padding:5px 12px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                2021 – 2022
+              </span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem 1rem;border-radius:10px;background:rgba(255,140,66,0.05);border:1px solid rgba(255,140,66,0.2);margin-bottom:0.875rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <p style="color:#6b7280;font-size:0.875rem;line-height:1.6;margin:0;">Memimpin tim software dalam divisi robotika, menyelenggarakan seminar pemrograman robotik untuk meningkatkan kompetensi anggota.</p>
+            </div>
+            <button onclick="openLightbox('./sertifikat-robotik.jpg','Sertifikat Koordinator Bidang Software – KS Robotik UAJY')" style="display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:600;color:#2D6A4F;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#2D6A4F'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              View Certificate
+            </button>
+          </div>
+        </div>
+
+        <!-- KS Pemrograman -->
+        <div class="fade-up delay-2" style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.04);transition:box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 6px rgba(0,0,0,0.04)'">
+          <div class="img-wrap" style="height:176px;overflow:hidden;position:relative;background:#f3f4f6;cursor:zoom-in;" onclick="openLightbox('./sertifikat-pemrograman.png','Sertifikat Anggota KS Pemrograman UAJY')">
+            <img src="./sertifikat-pemrograman.png" alt="Sertifikat KS Pemrograman" class="img-zoom" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            <div class="img-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);"></div>
+            <div class="zoom-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#1f2937;font-size:0.8rem;font-weight:700;padding:6px 14px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View Certificate
+              </div>
+            </div>
+          </div>
+          <div style="padding:1.5rem 2rem;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:1rem;">
+              <div style="display:flex;align-items:flex-start;gap:1rem;">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(45,106,79,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                <div>
+                  <h3 style="font-size:1.1rem;font-weight:700;color:#111;margin:0 0 2px;">Tutor Bahasa C</h3>
+                  <div style="color:#6b7280;font-weight:500;font-size:0.9rem;">KS Pemrograman UAJY</div>
+                </div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;font-weight:600;color:#6b7280;background:#f3f4f6;padding:5px 12px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                2020 – 2021
+              </span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem 1rem;border-radius:10px;background:rgba(255,140,66,0.05);border:1px solid rgba(255,140,66,0.2);margin-bottom:0.875rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <p style="color:#6b7280;font-size:0.875rem;line-height:1.6;margin:0;">Mengajar fundamental programming kepada sesama mahasiswa, menyusun materi pembelajaran terstruktur, dan melakukan mentoring rutin.</p>
+            </div>
+            <button onclick="openLightbox('./sertifikat-pemrograman.png','Sertifikat Anggota KS Pemrograman UAJY')" style="display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:600;color:#2D6A4F;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#2D6A4F'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              View Certificate
+            </button>
+          </div>
+        </div>
+
+        <!-- Taekwondo -->
+        <div class="fade-up delay-3" style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.04);transition:box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 6px rgba(0,0,0,0.04)'">
+          <div class="img-wrap" style="height:176px;overflow:hidden;position:relative;background:#f3f4f6;cursor:zoom-in;" onclick="openLightbox('./sertifikat-taekwondo.jpg','Sertifikat Sekretaris UKM Taekwondo UAJY')">
+            <img src="./sertifikat-taekwondo.jpg" alt="Sertifikat Taekwondo" class="img-zoom" style="width:100%;height:100%;object-fit:cover;object-position:top;" />
+            <div class="img-overlay" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);"></div>
+            <div class="zoom-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#1f2937;font-size:0.8rem;font-weight:700;padding:6px 14px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                View Certificate
+              </div>
+            </div>
+          </div>
+          <div style="padding:1.5rem 2rem;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:1rem;">
+              <div style="display:flex;align-items:flex-start;gap:1rem;">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(45,106,79,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#2D6A4F" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <h3 style="font-size:1.1rem;font-weight:700;color:#111;margin:0 0 2px;">Sekretaris</h3>
+                  <div style="color:#6b7280;font-weight:500;font-size:0.9rem;">UKM Taekwondo UAJY</div>
+                </div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.8rem;font-weight:600;color:#6b7280;background:#f3f4f6;padding:5px 12px;border-radius:999px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                2021 – 2022
+              </span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem 1rem;border-radius:10px;background:rgba(255,140,66,0.05);border:1px solid rgba(255,140,66,0.2);margin-bottom:0.875rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#FF8C42" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <p style="color:#6b7280;font-size:0.875rem;line-height:1.6;margin:0;">Mengelola administrasi organisasi dengan 20+ anggota aktif, menyusun notulensi rapat, surat menyurat, dan koordinasi kegiatan organisasi.</p>
+            </div>
+            <button onclick="openLightbox('./sertifikat-taekwondo.jpg','Sertifikat Sekretaris UKM Taekwondo UAJY')" style="display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:600;color:#2D6A4F;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#2D6A4F'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              View Certificate
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CONTACT
+  ═══════════════════════════════════════════ -->
+  <section id="contact" style="padding:6rem 0;background:#2D6A4F;color:#fff;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-6rem;right:-6rem;width:24rem;height:24rem;border-radius:50%;background:rgba(255,255,255,0.05);filter:blur(40px);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-6rem;left:-6rem;width:24rem;height:24rem;border-radius:50%;background:rgba(255,140,66,0.18);filter:blur(40px);pointer-events:none;"></div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;position:relative;z-index:1;">
+      <div class="fade-up" style="max-width:600px;margin:0 auto;text-align:center;">
+        <h2 style="font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.03em;margin:0 0 1.5rem;">Let's Work Together</h2>
+        <p style="color:rgba(255,255,255,0.78);font-size:1.05rem;line-height:1.7;margin:0 0 3rem;">
+          I'm currently looking for new opportunities as a System Analyst or Web Developer. My inbox is always open — feel free to reach out.
+        </p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1.25rem;margin-bottom:3rem;">
+          <a href="mailto:Yesisugandi900@gmail.com" style="display:flex;align-items:center;gap:1rem;color:#fff;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#fff'">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <span style="font-size:1.05rem;font-weight:600;">Yesisugandi900@gmail.com</span>
+          </a>
+          <a href="https://wa.link/f235hg" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:1rem;color:#fff;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#FF8C42'" onmouseout="this.style.color='#fff'">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div style="text-align:left;">
+              <div style="font-size:1.05rem;font-weight:600;line-height:1.2;">WhatsApp</div>
+              <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);">+62 822-8565-7596</div>
+            </div>
+          </a>
+        </div>
+        <div style="display:flex;justify-content:center;gap:1rem;">
+          <a href="https://www.linkedin.com/in/yesisugandi09" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+            style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;transition:background 0.2s,transform 0.2s;"
+            onmouseover="this.style.background='#FF8C42';this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.12)';this.style.transform='scale(1)';">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://github.com/YesiS9" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+            style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;transition:background 0.2s,transform 0.2s;"
+            onmouseover="this.style.background='#FF8C42';this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.12)';this.style.transform='scale(1)';">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer style="background:#fff;border-top:1px solid #e5e7eb;padding:2.5rem 0;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem;">
+      <div>
+        <p style="font-size:1.1rem;font-weight:800;color:#111;margin:0;">Yesi Sugandi<span style="color:#FF8C42;">.</span></p>
+        <p style="font-size:0.82rem;color:#6b7280;margin:2px 0 0;">System Analyst · Web Developer</p>
+      </div>
+      <p style="font-size:0.82rem;color:#6b7280;margin:0;text-align:center;">&copy; 2025 Yesi Sugandi. All rights reserved.</p>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <a href="mailto:Yesisugandi900@gmail.com" aria-label="Email" style="color:#9ca3af;transition:color 0.2s;" onmouseover="this.style.color='#2D6A4F'" onmouseout="this.style.color='#9ca3af'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/yesisugandi09" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" style="color:#9ca3af;transition:color 0.2s;" onmouseover="this.style.color='#2D6A4F'" onmouseout="this.style.color='#9ca3af'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="https://github.com/YesiS9" target="_blank" rel="noopener noreferrer" aria-label="GitHub" style="color:#9ca3af;transition:color 0.2s;" onmouseover="this.style.color='#2D6A4F'" onmouseout="this.style.color='#9ca3af'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </a>
+        <a href="https://wa.link/f235hg" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color:#9ca3af;transition:color 0.2s;" onmouseover="this.style.color='#2D6A4F'" onmouseout="this.style.color='#9ca3af'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════ -->
+  <script>
+    // ── Navbar scroll ──
+    const nb = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 24) {
+        nb.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:50;padding:0.75rem 0;background:rgba(255,255,255,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,0.07);box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:all 0.3s ease;';
+      } else {
+        nb.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:50;padding:1.5rem 0;background:transparent;transition:all 0.3s ease;';
+      }
+    });
+
+    // ── Scroll to top ──
+    function scrollTop(e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    // ── Mobile menu ──
+    let menuOpen = false;
+    function toggleMenu() {
+      menuOpen = !menuOpen;
+      document.getElementById('mobile-menu').style.display = menuOpen ? 'block' : 'none';
+      document.getElementById('ico-menu').style.display = menuOpen ? 'none' : 'block';
+      document.getElementById('ico-x').style.display   = menuOpen ? 'block' : 'none';
+    }
+    function closeMenu() {
+      menuOpen = false;
+      document.getElementById('mobile-menu').style.display = 'none';
+      document.getElementById('ico-menu').style.display = 'block';
+      document.getElementById('ico-x').style.display   = 'none';
+    }
+
+    // ── Lightbox ──
+    function openLightbox(src, alt) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-img').alt = alt;
+      document.getElementById('lightbox-cap').textContent = alt;
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    // ── Intersection Observer for scroll animations ──
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up, .fade-left, .fade-right').forEach(el => io.observe(el));
+
+    // ── About grid layout responsive ──
+    function setAboutGrid() {
+      const grid = document.querySelector('#about > div > div');
+      if (!grid) return;
+      grid.style.gridTemplateColumns = window.innerWidth >= 768 ? '5fr 7fr' : '1fr';
+    }
+    setAboutGrid();
+    window.addEventListener('resize', setAboutGrid);
+  </script>
+</body>
+</html>
